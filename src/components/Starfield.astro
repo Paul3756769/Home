@@ -42,23 +42,177 @@ const {
 </div>
   
 <script is:inline>
+  // Self-contained helpers
+
+  function createSeededRandom(seed) {
+    let state = seed;
+    return () => {
+      state = (state * 9301 + 49297) % 233280;
+      return state / 233280;
+    };
+  }
+
+  // resizeCanvas: sets canvas size and updates star absolute positions from stored percentages.
+  // initStarsFn is a zero-arg function that will initialize `stars` if needed.
+  function resizeCanvas(canvas, stars, initStarsFn) {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    if (stars.length > 0) {
+      stars.forEach(star => {
+        star.x = star.xPercent * canvas.width;
+        star.y = star.yPercent * canvas.height;
+      });
+    } else {
+      initStarsFn();
+    }
+  }
+
+  // initStars: populates the provided `stars` array using a passed config object.
+  function initStars(config, stars) {
+    const {
+      starCount, canvas, seedRandom,
+      colorVariety, pointiness,
+      twinkleSpeed, twinkleSpeedVariation
+    } = config;
+
+    stars.length = 0;
+
+    for (let i = 0; i < starCount; i++) {
+      const xPercent = seedRandom();
+      const yPercent = seedRandom();
+      const x = xPercent * canvas.width;
+      const y = yPercent * canvas.height;
+
+      const sizeRandom = seedRandom();
+      let size;
+      if (sizeRandom > 0.998) {
+        size = 1.5 + seedRandom() * 1;
+      } else if (sizeRandom > 0.98) {
+        size = 0.8 + seedRandom() * 0.5;
+      } else if (sizeRandom > 0.85) {
+        size = 0.4 + seedRandom() * 0.3;
+      } else {
+        size = 0.1 + seedRandom() * 0.3;
+      }
+
+      const maxOpacity = 0.4 + seedRandom() * 0.6;
+      const twinklePhase = seedRandom() * Math.PI * 2;
+      const starTwinkleSpeed = twinkleSpeed + seedRandom() * twinkleSpeedVariation;
+
+      let hue, saturation, lightness;
+      const colorType = seedRandom();
+      if (colorType > (1 - colorVariety * 0.3)) {
+        hue = 0 + seedRandom() * 20;
+        saturation = 30 + seedRandom() * 20;
+        lightness = 80 + seedRandom() * 15;
+      } else if (colorType > (1 - colorVariety * 0.6)) {
+        hue = 200 + seedRandom() * 40;
+        saturation = 30 + seedRandom() * 20;
+        lightness = 80 + seedRandom() * 15;
+      } else if (colorType > (1 - colorVariety)) {
+        hue = 40 + seedRandom() * 20;
+        saturation = 30 + seedRandom() * 20;
+        lightness = 80 + seedRandom() * 15;
+      } else {
+        hue = 180 + seedRandom() * 60;
+        saturation = 5 + seedRandom() * 25;
+        lightness = 85 + seedRandom() * 15;
+      }
+
+      const color = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+      const isPointStar = size < 1 && seedRandom() < pointiness;
+
+      stars.push({
+        xPercent, yPercent, x, y, size, maxOpacity, color, twinklePhase,
+        twinkleSpeed: starTwinkleSpeed, isPointStar
+      });
+    }
+  }
+
+  // createAnimator: returns a controller with start() and stop() for the animation loop.
+  function createAnimator(ctx, canvas, stars, options) {
+    const { twinkleAmount, twinkleOpacityBase, glowStrength } = options;
+    let animationId = null;
+    let lastTime = 0;
+
+    function frame(timestamp) {
+      if (!lastTime) lastTime = timestamp;
+      const deltaTime = timestamp - lastTime;
+      lastTime = timestamp;
+
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      stars.forEach(star => {
+        star.twinklePhase += star.twinkleSpeed * deltaTime;
+
+        const twinkling = Math.max(twinkleOpacityBase, 1 - twinkleAmount);
+        const twinkleFactor = twinkleAmount * Math.sin(star.twinklePhase);
+        const opacity = star.maxOpacity * (twinkling + twinkleFactor);
+
+        ctx.globalAlpha = opacity;
+
+        if (star.isPointStar) {
+          ctx.fillStyle = star.color;
+          ctx.fillRect(star.x, star.y, 1, 1);
+          if (star.size > 0.6) {
+            ctx.fillRect(star.x - 1, star.y, 3, 1);
+            ctx.fillRect(star.x, star.y - 1, 1, 3);
+          }
+        } else {
+          ctx.beginPath();
+          ctx.arc(star.x, star.y, star.size / 2, 0, Math.PI * 2);
+          ctx.fillStyle = star.color;
+          ctx.fill();
+
+          if (star.size > 1.2 && glowStrength > 0) {
+            const glowSize = star.size * 1.5 * glowStrength;
+            const gradient = ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, glowSize);
+            gradient.addColorStop(0, star.color);
+            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, glowSize, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+          }
+        }
+
+        ctx.globalAlpha = 1;
+      });
+
+      animationId = requestAnimationFrame(frame);
+    }
+
+    return {
+      start() {
+        if (animationId == null) animationId = requestAnimationFrame(frame);
+      },
+      stop() {
+        if (animationId != null) {
+          cancelAnimationFrame(animationId);
+          animationId = null;
+        }
+      }
+    };
+  }
+
   // Wait for DOM to fully load
   document.addEventListener('DOMContentLoaded', () => {
     try {
-      // Canvas setup with null checks
       const canvas = document.getElementById('starCanvas');
       if (!canvas) {
         console.error('Star canvas element not found');
         return;
       }
-      
+
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         console.error('Could not get 2d context from canvas');
         return;
       }
-      
-      // Get configuration from data attributes
+
       const starfieldElement = document.querySelector('.star-field');
       const starCount = parseInt(starfieldElement.dataset.starCount || '1500');
       const twinkleAmount = parseFloat(starfieldElement.dataset.twinkleAmount || '0.3');
@@ -69,200 +223,32 @@ const {
       const twinkleSpeedVariation = parseFloat(starfieldElement.dataset.twinkleSpeedVariation || '0.0005');
       const twinkleOpacityBase = parseFloat(starfieldElement.dataset.twinkleOpacityBase || '0.6');
       const rngSeed = starfieldElement.dataset.rngSeed ? parseInt(starfieldElement.dataset.rngSeed) : null;
-      
-      // Seeded random number generator
-      let seedRandom;
-      
-      if (rngSeed !== null) {
-        // Simple implementation of a seeded random number generator
-        const createSeededRandom = (seed) => {
-          let state = seed;
-          return () => {
-            state = (state * 9301 + 49297) % 233280;
-            return state / 233280;
-          };
-        };
-        
-        seedRandom = createSeededRandom(rngSeed);
-      } else {
-        // Use regular Math.random if no seed provided
-        seedRandom = Math.random;
-      }
-      
-      // Star configuration
+
+      const seedRandom = rngSeed !== null ? createSeededRandom(rngSeed) : Math.random;
+
       const stars = [];
-      
-      // Make canvas full screen
-      function resizeCanvas() {
-        const oldWidth = canvas.width;
-        const oldHeight = canvas.height;
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        
-        // Update star positions instead of reinitializing
-        if (stars.length > 0) {
-          stars.forEach(star => {
-            // Use percentage positions to calculate new absolute positions
-            star.x = star.xPercent * canvas.width;
-            star.y = star.yPercent * canvas.height;
-          });
-        } else {
-          // Only initialize stars on first run
-          initStars();
-        }
-      }
-      
-      // Set up resize listener
-      resizeCanvas();
-      window.addEventListener('resize', resizeCanvas);
-      
-      // Initialize stars
-      function initStars() {
-        stars.length = 0; // Clear existing stars
-        
-        for (let i = 0; i < starCount; i++) {
-          // Store positions as percentages of canvas dimensions
-          const xPercent = seedRandom();
-          const yPercent = seedRandom();
-          const x = xPercent * canvas.width;
-          const y = yPercent * canvas.height;
-          
-          // Randomize star size - make them much smaller overall
-          const sizeRandom = seedRandom();
-          let size;
-          
-          if (sizeRandom > 0.998) {
-            // Extremely rare large star (0.2%)
-            size = 1.5 + seedRandom() * 1;
-          } else if (sizeRandom > 0.98) {
-            // Rare medium star (1.8%)
-            size = 0.8 + seedRandom() * 0.5;
-          } else if (sizeRandom > 0.85) {
-            // Uncommon small star (13%)
-            size = 0.4 + seedRandom() * 0.3;
-          } else {
-            // Most stars are tiny points (85%)
-            size = 0.1 + seedRandom() * 0.3;
-          }
-          
-          // Twinkling properties (more variation and faster)
-          const maxOpacity = 0.4 + seedRandom() * 0.6; // Varied base opacity
-          const twinklePhase = seedRandom() * Math.PI * 2; // random starting phase
-          const starTwinkleSpeed = twinkleSpeed + seedRandom() * twinkleSpeedVariation; // Controlled twinkle speed
-          
-          // Star colors
-          let hue, saturation, lightness;
-          
-          const colorType = seedRandom();
-          // The threshold for colored stars is determined by the colorVariety parameter
-          if (colorType > (1 - colorVariety * 0.3)) {
-            // Reddish star (rare)
-            hue = 0 + seedRandom() * 20;
-            saturation = 30 + seedRandom() * 20;
-            lightness = 80 + seedRandom() * 15;
-          } else if (colorType > (1 - colorVariety * 0.6)) {
-            // Bluish star (rare)
-            hue = 200 + seedRandom() * 40;
-            saturation = 30 + seedRandom() * 20;
-            lightness = 80 + seedRandom() * 15;
-          } else if (colorType > (1 - colorVariety)) {
-            // Yellowish star (rare)
-            hue = 40 + seedRandom() * 20;
-            saturation = 30 + seedRandom() * 20;
-            lightness = 80 + seedRandom() * 15;
-          } else {
-            // White/blue-white stars (majority)
-            hue = 180 + seedRandom() * 60;
-            saturation = 5 + seedRandom() * 25; // Less saturation
-            lightness = 85 + seedRandom() * 15; // Brighter
-          }
-          
-          const color = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-          
-          // Determine if this is a "point star" (controlled by pointiness parameter)
-          const isPointStar = size < 1 && seedRandom() < pointiness;
-          
-          stars.push({
-            xPercent, yPercent, x, y, size, maxOpacity, color, twinklePhase, twinkleSpeed: starTwinkleSpeed, isPointStar
-          });
-        }
-      }
-      
-      // Animation variables
-      let animationId;
-      let lastTime = 0;
-      
-      // Animation loop (subtle twinkling only)
-      function animate(timestamp) {
-        if (!lastTime) lastTime = timestamp;
-        const deltaTime = timestamp - lastTime;
-        lastTime = timestamp;
-        
-        // Clear canvas
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Draw stars with twinkling effect
-        stars.forEach(star => {
-          // Update twinkling phase
-          star.twinklePhase += star.twinkleSpeed * deltaTime;
-          
-          // Enhanced twinkling calculation - make it more pronounced
-          const twinkling = Math.max(twinkleOpacityBase, 1 - twinkleAmount); // Base opacity from parameter
-          const twinkleFactor = twinkleAmount * Math.sin(star.twinklePhase);
-          const opacity = star.maxOpacity * (twinkling + twinkleFactor);
-          
-          ctx.globalAlpha = opacity;
-          
-          if (star.isPointStar) {
-            // Use the calculated x and y positions
-            ctx.fillStyle = star.color;
-            ctx.fillRect(star.x, star.y, 1, 1); // Just a single pixel for tiny stars
-            
-            // For slightly larger point stars, add a subtle cross shape
-            if (star.size > 0.6) {
-              ctx.fillRect(star.x - 1, star.y, 3, 1);
-              ctx.fillRect(star.x, star.y - 1, 1, 3);
-            }
-          } else {
-            // Use the calculated x and y positions
-            ctx.beginPath();
-            ctx.arc(star.x, star.y, star.size / 2, 0, Math.PI * 2);
-            ctx.fillStyle = star.color;
-            ctx.fill();
-            
-            // Glow effect only for the largest stars
-            if (star.size > 1.2 && glowStrength > 0) {
-              const glowSize = star.size * 1.5 * glowStrength;
-              const gradient = ctx.createRadialGradient(
-                star.x, star.y, 0,
-                star.x, star.y, glowSize
-              );
-              gradient.addColorStop(0, star.color);
-              gradient.addColorStop(1, 'rgba(0,0,0,0)');
-              
-              ctx.beginPath();
-              ctx.arc(star.x, star.y, glowSize, 0, Math.PI * 2);
-              ctx.fillStyle = gradient;
-              ctx.fill();
-            }
-          }
-          
-          ctx.globalAlpha = 1;
-        });
-        
-        // Continue animation loop
-        animationId = requestAnimationFrame(animate);
-      }
-      
-      // Initialize and start animation
-      initStars();
-      animationId = requestAnimationFrame(animate);
-      
+
+      // bind initStars so resizeCanvas can call it without arguments
+      const initStarsBound = () => initStars({
+        starCount, canvas, seedRandom,
+        colorVariety, pointiness, twinkleSpeed, twinkleSpeedVariation
+      }, stars);
+
+      // initial sizing and listeners
+      resizeCanvas(canvas, stars, initStarsBound);
+      window.addEventListener('resize', () => resizeCanvas(canvas, stars, initStarsBound));
+
+      // animator
+      const animator = createAnimator(ctx, canvas, stars, { twinkleAmount, twinkleOpacityBase, glowStrength });
+
+      // init and start
+      initStarsBound();
+      animator.start();
+
       // Cleanup on page change/component removal
       document.addEventListener('astro:before-swap', () => {
-        cancelAnimationFrame(animationId);
-        window.removeEventListener('resize', resizeCanvas);
+        animator.stop();
+        window.removeEventListener('resize', () => resizeCanvas(canvas, stars, initStarsBound));
       });
     } catch (error) {
       console.error('Error in starfield animation:', error);
