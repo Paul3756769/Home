@@ -1,5 +1,5 @@
 ---
-layout: "../layouts/MarkdownBlog.astro"
+layout: "../../layouts/MarkdownBlog.astro"
 title: "Demo Blog Post"
 description: "This is the placeholder page for my blog"
 ---
