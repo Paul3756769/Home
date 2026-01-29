@@ -1,0 +1,20 @@
+---
+const { frontmatter } = Astro.props;
+import Layout from "./Layout.astro";
+
+---
+<Layout page_title={frontmatter.title}>
+    <main class="blog-content">
+        <h1>{frontmatter.title}</h1>
+        <slot />
+    </main>
+</Layout>
+
+<style>
+    .blog-content {
+        max-width: 60ch;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+</style>
+

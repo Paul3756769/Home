@@ -1,0 +1,23 @@
+---
+import Layout from "./Layout.astro";
+const { page_title } = Astro.props;
+---
+<Layout page_title={page_title}>
+    <div class="content-wrapper">
+        <center>
+            <slot />
+        </center>
+    </div>
+</Layout>
+
+<style>
+    .content-wrapper {
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+    }
+</style>

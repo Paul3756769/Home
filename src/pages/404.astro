@@ -1,5 +1,5 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import CenteredLayout from "../layouts/CenteredLayout.astro";
 const title = "404";
 const img_url = "/Homepage/404.gif";
 //const img_url = "/Homepage/tng.gif";
@@ -7,15 +7,12 @@ const img_url = "/Homepage/404.gif";
 //const img_url = "/Homepage/monkey_pc.gif";
 const alt_text = "404";
 ---
-<Layout page_title = {title}>
+<CenteredLayout page_title={title}>
   <!---<div class="background-404">404</div>-->
-  <center>
   <h1>Page does not exist</h1>
   <img src={img_url} alt={alt_text} />
   <p>Sorry for that.</p>
-  </center>
-
-</Layout>
+</CenteredLayout>
 
 <style>
   .background-404 {

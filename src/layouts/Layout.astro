@@ -14,10 +14,7 @@ const { page_title } = Astro.props;
     <body>
         <!-- Starfield component in the background -->
         <Starfield />
-        <!-- Base content wrapper: occupies the full viewport. -->
-        <div class="content-wrapper">
-            <slot />
-        </div>
+        <slot />
     </body>
 </html>
 
@@ -29,15 +26,4 @@ const { page_title } = Astro.props;
         height: 100%;
     }
 
-    /* Ensure the wrapper spans the entire page */
-    .content-wrapper {
-        min-height: 100vh;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        /* Layouts that include header/footer or main can override alignment */
-        justify-content: center;
-        align-items: center;
-        box-sizing: border-box;
-    }
 </style>
