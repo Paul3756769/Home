@@ -3,11 +3,28 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 const title = "About";
 ---
 <BaseLayout page_title={title}>
-  <section>
-    <h1>About me</h1>
+  <section class="about-page">
+    <p class="eyebrow">About</p>
+    <h1>Hi, I'm Paul.</h1>
     <p>
-      This page is a testing ground for content-heavy layouts. You can rewrite
-      everything here freely without affecting the rest of the site.
+      I build thoughtful interfaces and calm digital experiences. My focus is on
+      clarity, accessibility, and motion that feels intentional rather than loud.
+    </p>
+    <div class="callout">
+      <strong>Current focus:</strong> refining a cohesive personal site and
+      documenting design experiments with a lean, modern aesthetic.
+    </div>
+    <h2>What I value</h2>
+    <ul>
+      <li>Simple typography with generous spacing.</li>
+      <li>Purposeful color accents that guide attention.</li>
+      <li>Subtle interaction cues that feel quiet and confident.</li>
+    </ul>
+    <hr />
+    <h2>Outside of the work</h2>
+    <p>
+      You'll find me sketching layouts, collecting interface references, and
+      tinkering with new ways to tell stories through small details.
     </p>
   </section>
 </BaseLayout>
