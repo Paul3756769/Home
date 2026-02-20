@@ -52,6 +52,19 @@ a:hover {
   justify-content: center;
   padding: 96px 24px 80px;
   box-sizing: border-box;
+  position: relative;
+}
+
+.page-shell::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 140px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0) 100%);
+  pointer-events: none;
+  z-index: 4;
 }
 
 .page-content {
