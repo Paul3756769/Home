@@ -12,7 +12,7 @@
     "postCreateCommand": "npm install",
     "customizations": {
         "vscode": {
-            "extensions": ["astro-build.astro-vscode"]
+            "extensions": ["astro-build.astro-vscode", "dbaeumer.vscode-eslint", "ritwickdey.liveserver"]
         }
     }
 }
