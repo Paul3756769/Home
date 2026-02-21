@@ -15,6 +15,8 @@ facilisis nibh, at volutpat neque porta non. Suspendisse potenti. Praesent
 consectetur, lorem at vulputate luctus, lacus sem faucibus tortor, id feugiat
 purus nisi non sem.
 
+$$\vec x$$
+
 ## Heading 2
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget quam quis
