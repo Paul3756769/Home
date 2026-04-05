@@ -7,10 +7,9 @@ const img_url = "/Homepage/404.gif";
 //const img_url = "/Homepage/monkey_pc.gif";
 const alt_text = "404";
 ---
-<BaseLayout page_title={title} noShell>
+<BaseLayout page_title={title}>
   <div class="content-wrapper">
     <center>
-      <!---<div class="background-404">404</div>-->
       <h1>Page does not exist</h1>
       <img src={img_url} alt={alt_text} />
       <p>Sorry for that.</p>
@@ -28,33 +27,7 @@ const alt_text = "404";
     align-items: center;
     box-sizing: border-box;
   }
-
-  .background-404 {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 80vw;
-    line-height: 1;
-    font-weight: 900;
-    letter-spacing: -0.05em;
-    white-space: nowrap;
-    color: rgba(255, 255, 255, 0.15);
-    z-index: -1;
-    pointer-events: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    text-transform: uppercase;
-  }
   
-  /* Position the content above the background */
   h1, p, img {
     position: relative;
     z-index: 1;
