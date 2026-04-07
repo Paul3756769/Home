@@ -5,7 +5,7 @@ const page_title = "Home";
 <BaseLayout page_title={page_title}>
   <div class="content-wrapper">
     <div class="avatar-wrap" aria-hidden="true">
-      <img id="profile-avatar" src="/favicon.svg" alt="" />
+      <img src="/favicon.svg" alt="" onerror="this.style.display='none'" />
     </div>
     <div class="intro">
       <h1>Hi there! I am <span class="name-highlight">Paul</span></h1>
@@ -13,22 +13,6 @@ const page_title = "Home";
     </div>
   </div>
 </BaseLayout>
-
-<script is:inline>
-  document.addEventListener("DOMContentLoaded", () => {
-    const avatar = document.getElementById("profile-avatar");
-    const wrapper = document.querySelector(".content-wrapper");
-    if (!avatar || !wrapper) return;
-
-    const useFallbackLayout = () => wrapper.classList.add("no-avatar");
-
-    if (avatar.complete && avatar.naturalWidth === 0) {
-      useFallbackLayout();
-    }
-
-    avatar.addEventListener("error", useFallbackLayout, { once: true });
-  });
-</script>
 
 <style>
 
@@ -83,14 +67,6 @@ const page_title = "Home";
 
   .name-highlight {
     color: #878787;
-  }
-
-  .content-wrapper.no-avatar .avatar-wrap {
-    display: none;
-  }
-
-  .content-wrapper.no-avatar {
-    gap: 0.9rem;
   }
 
   @media (max-width: 640px) {
