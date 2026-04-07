@@ -1,0 +1,76 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+
+export interface Props {
+	page_title?: string;
+	title?: string;
+	date?: string;
+	frontmatter?: {
+		title?: string;
+		page_title?: string;
+		date?: string;
+	};
+}
+
+const { page_title, title, date, frontmatter } = Astro.props as Props;
+const resolvedTitle = title ?? frontmatter?.title ?? "Blog Post";
+const resolvedPageTitle = page_title ?? frontmatter?.page_title ?? resolvedTitle;
+const resolvedDate = date ?? frontmatter?.date;
+---
+
+<BaseLayout page_title={resolvedPageTitle}>
+	<main class="blog-container">
+		<article>
+			<header>
+				<h1>{resolvedTitle}</h1>
+				{resolvedDate && <p class="meta">{resolvedDate}</p>}
+			</header>
+			<slot />
+		</article>
+	</main>
+</BaseLayout>
+
+<style>
+	.blog-container {
+		min-height: 100vh;
+		display: flex;
+		justify-content: center;
+		padding: 3rem 1.5rem;
+		box-sizing: border-box;
+	}
+
+	article {
+		width: 100%;
+		max-width: 700px;
+	}
+
+	header {
+		margin-bottom: 2rem;
+	}
+
+	h1 {
+		margin: 0;
+		font-size: 2rem;
+		line-height: 1.2;
+	}
+
+	.meta {
+		margin-top: 0.5rem;
+		color: #bdb7af;
+		font-size: 0.95rem;
+	}
+
+	:global(article p) {
+		margin: 1rem 0;
+	}
+
+	:global(article h2) {
+		margin-top: 2rem;
+		margin-bottom: 0.75rem;
+		font-size: 1.35rem;
+	}
+
+	:global(article ul) {
+		padding-left: 1.25rem;
+	}
+</style>
