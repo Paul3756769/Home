@@ -5,6 +5,9 @@ const page_title = "Home";
 ---
 <BaseLayout page_title={page_title} show_nav={false}>
   <div class="content-wrapper">
+    <div class="avatar-wrap" aria-hidden="true">
+      <img id="profile-avatar" src="/favicon.svg" alt="" />
+    </div>
     <div class="intro">
       <h1>Hi there! I am <span class="name-highlight">Paul</span></h1>
       <p>Press space :)</p>
@@ -15,38 +18,107 @@ const page_title = "Home";
   </div>
 </BaseLayout>
 
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const avatar = document.getElementById("profile-avatar");
+    const wrapper = document.querySelector(".content-wrapper");
+    if (!avatar || !wrapper) return;
+
+    const useFallbackLayout = () => wrapper.classList.add("no-avatar");
+
+    if (avatar.complete && avatar.naturalWidth === 0) {
+      useFallbackLayout();
+    }
+
+    avatar.addEventListener("error", useFallbackLayout, { once: true });
+  });
+</script>
+
 <style>
 
   .content-wrapper {
     position: relative;
-    height: 100vh;
+    min-height: 100vh;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.35rem;
+    padding: 1.25rem;
     box-sizing: border-box;
   }
 
+  .avatar-wrap {
+    width: 9rem;
+    height: 9rem;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 2px solid #3b4256;
+    background: rgba(10, 14, 23, 0.65);
+    display: grid;
+    place-items: center;
+  }
+
+  .avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
   .intro {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     text-align: center;
     width: min(92vw, 700px);
   }
 
+  .intro h1 {
+    margin: 0;
+  }
+
+  .intro p {
+    margin: 1rem 0 0;
+  }
+
   .home-nav-row {
-    position: absolute;
-    top: calc(50% + 5.25rem);
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 2;
+    margin-top: 0.2rem;
   }
 
   .name-highlight {
     color: #878787;
   }
 
+  .content-wrapper.no-avatar .avatar-wrap {
+    display: none;
+  }
+
+  .content-wrapper.no-avatar {
+    display: block;
+    padding: 0;
+  }
+
+  .content-wrapper.no-avatar .intro {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .content-wrapper.no-avatar .home-nav-row {
+    position: absolute;
+    top: calc(50% + 5.25rem);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
   @media (max-width: 640px) {
-    .home-nav-row {
+    .avatar-wrap {
+      width: 12rem;
+      height: 12rem;
+    }
+
+    .content-wrapper.no-avatar .home-nav-row {
       top: calc(50% + 6rem);
     }
   }
