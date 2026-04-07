@@ -1,14 +1,46 @@
 @import "katex/dist/katex.min.css";
 
+:root {
+  --site-max-width: 720px;
+  --article-max-width: 700px;
+  --site-side-pad: 1.25rem;
+}
+
+html,
 body {
   margin: 0;
   padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body {
   background-color: #0A0E17;
-  /*color: #ffffff;*/
-  color: #f4f0eb; /*warmer off-white for better readability*/
-  /*color: #EAEAEA;*/ /*slightly brighter off-white*/
+  color: #f4f0eb;
   font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
   line-height: 1.6;
+}
+
+.site-header {
+  position: relative;
+  z-index: 10;
+  padding-top: 1.25rem;
+}
+
+.site-shell {
+  width: min(100%, var(--site-max-width));
+  margin: 0 auto;
+  padding: 0 var(--site-side-pad);
+  box-sizing: border-box;
+}
+
+.page-content {
+  margin: 3rem auto;
+}
+
+.article-content {
+  width: 100%;
+  max-width: var(--article-max-width);
 }
 
 a {

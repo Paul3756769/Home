@@ -1,25 +1,55 @@
 ---
 export interface Props {
   variant?: "header" | "inline";
+  show_home?: boolean;
 }
 
-const { variant = "header" } = Astro.props as Props;
-const navClass = variant === "inline" ? "site-nav inline" : "site-nav";
+const { variant = "header", show_home = true } = Astro.props as Props;
+const isHeader = variant === "header";
+const navClass = isHeader ? "site-nav site-nav-header" : "site-nav site-nav-inline";
 ---
 
 <nav class={navClass} aria-label="Site navigation">
-  <a href="/">Home</a>
-  <a href="/blog">Blog</a>
-  <a href="/about">About Me</a>
+  {isHeader ? (
+    <>
+      <div class="nav-group nav-left">
+        <a href="/">Home</a>
+      </div>
+      <div class="nav-group nav-right">
+        <a href="/blog">Blog</a>
+        <a href="/about">About Me</a>
+      </div>
+    </>
+  ) : (
+    <>
+      {show_home && <a href="/">Home</a>}
+      <a href="/blog">Blog</a>
+      <a href="/about">About Me</a>
+    </>
+  )}
 </nav>
 
 <style>
   .site-nav {
     display: flex;
-    gap: 1rem;
     align-items: center;
-    justify-content: center;
     font-size: 0.95rem;
+    gap: 0.75rem;
+  }
+
+  .site-nav-header {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .site-nav-inline {
+    justify-content: center;
+  }
+
+  .nav-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
   }
 
   .site-nav a {
@@ -33,9 +63,5 @@ const navClass = variant === "inline" ? "site-nav inline" : "site-nav";
   .site-nav a:hover {
     color: #ffffff;
     border-color: #7a8fb3;
-  }
-
-  .site-nav.inline {
-    gap: 0.75rem;
   }
 </style>

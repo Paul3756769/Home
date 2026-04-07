@@ -19,8 +19,8 @@ const resolvedDate = date ?? frontmatter?.date;
 ---
 
 <BaseLayout page_title={resolvedPageTitle}>
-	<main class="blog-container">
-		<article>
+	<main class="site-shell page-content blog-container">
+		<article class="article-content">
 			<header>
 				<h1>{resolvedTitle}</h1>
 				{resolvedDate && <p class="meta">{resolvedDate}</p>}
@@ -32,16 +32,7 @@ const resolvedDate = date ?? frontmatter?.date;
 
 <style>
 	.blog-container {
-		min-height: 100vh;
-		display: flex;
-		justify-content: center;
-		padding: 3rem 1.5rem;
-		box-sizing: border-box;
-	}
-
-	article {
-		width: 100%;
-		max-width: 700px;
+		min-height: calc(100vh - 5rem);
 	}
 
 	header {
