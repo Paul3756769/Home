@@ -1,0 +1,41 @@
+---
+export interface Props {
+  variant?: "header" | "inline";
+}
+
+const { variant = "header" } = Astro.props as Props;
+const navClass = variant === "inline" ? "site-nav inline" : "site-nav";
+---
+
+<nav class={navClass} aria-label="Site navigation">
+  <a href="/">Home</a>
+  <a href="/blog">Blog</a>
+  <a href="/about">About Me</a>
+</nav>
+
+<style>
+  .site-nav {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+  }
+
+  .site-nav a {
+    color: #d8d3cc;
+    border: 1px solid #3b4256;
+    padding: 0.35rem 0.7rem;
+    border-radius: 4px;
+    text-decoration: none;
+  }
+
+  .site-nav a:hover {
+    color: #ffffff;
+    border-color: #7a8fb3;
+  }
+
+  .site-nav.inline {
+    gap: 0.75rem;
+  }
+</style>

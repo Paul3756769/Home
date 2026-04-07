@@ -1,12 +1,14 @@
 ---
 import Starfield from "../components/Starfield.astro";
+import SiteNav from "../components/SiteNav.astro";
 import "../styles/global.css";
 
 export interface Props {
   page_title?: string;
+  show_nav?: boolean;
 }
 
-const { page_title = "Home" } = Astro.props as Props;
+const { page_title = "Home", show_nav = true } = Astro.props as Props;
 ---
 
 <!doctype html>
@@ -19,6 +21,11 @@ const { page_title = "Home" } = Astro.props as Props;
   </head>
   <body>
     <Starfield />
+    {show_nav && (
+      <header class="site-header">
+        <SiteNav />
+      </header>
+    )}
     <slot />
   </body>
 </html>
@@ -30,6 +37,12 @@ const { page_title = "Home" } = Astro.props as Props;
     padding: 0;
     width: 100%;
     height: 100%;
+  }
+
+  .site-header {
+    position: relative;
+    z-index: 10;
+    padding: 1.25rem 1.5rem 0;
   }
 </style>
 
