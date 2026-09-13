@@ -8,27 +8,25 @@ const img_url = "/Homepage/404.gif";
 const alt_text = "404";
 ---
 <BaseLayout page_title={title}>
-  <div class="content-wrapper">
-    <center>
-      <h1>Page does not exist</h1>
-      <img src={img_url} alt={alt_text} />
-      <p>Sorry for that.</p>
-    </center>
+  <div class="content-box">
+    <h1>Page does not exist</h1>
+    <img src={img_url} alt={alt_text} />
+    <p>Sorry for that.</p>
   </div>
 </BaseLayout>
 
 <style>
-  .content-wrapper {
-    height: 100vh;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
+  .content-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
   }
-  
-  h1, p, img {
+
+  .content-box h1,
+  .content-box p,
+  .content-box img {
     position: relative;
     z-index: 1;
   }

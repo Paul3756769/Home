@@ -3,24 +3,20 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 const page_title = "Home";
 ---
 <BaseLayout page_title={page_title}>
-  <div class="content-wrapper">
-    <center>
-      <h1>Hi there! I am <span class="name-highlight">Paul</span></h1>
-      <p>Nice to meet you!!</p>
-    </center>
+  <div class="content-box">
+    <h1>Hi there! I am <span class="name-highlight">Paul</span></h1>
+    <p>Nice to meet you!!</p>
   </div>
 </BaseLayout>
 
 <style>
 
-  .content-wrapper {
-    height: 100vh;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
+  .content-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
   }
 
   .name-highlight {
